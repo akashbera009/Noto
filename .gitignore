@@ -1,0 +1,16 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.env
+
+# React Native
+node_modules/
+android/build/
+ios/build/
+
+# macOS
+.DS_Store
+
+# Env
+.env

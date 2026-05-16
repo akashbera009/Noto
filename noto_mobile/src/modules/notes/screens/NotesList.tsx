@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   StatusBar,
+  Image,
 } from 'react-native';
 import { Colors } from '../../../utils/colors';
 import { FontFamily, FontSize, FontWeight } from '../../../utils/fonts';
@@ -26,6 +27,7 @@ import AISummarizeModal from '../../../modals/AISummarizeModal';
 import type { Note, NotesNavProp } from '../../../utils/types';
 import { Animated } from 'react-native';
 import { useFadeIn } from '../../../utils/hooks';
+import LocalImages from '../../../utils/localImages';
 
 interface Props {
   navigation: NotesNavProp;
@@ -36,7 +38,8 @@ const NoteCard: React.FC<{
   onPress: () => void;
   onLongPress: () => void;
   index: number;
-}> = ({ note, onPress, onLongPress, index }) => {
+  showAi?: boolean
+}> = ({ note, onPress, onLongPress, index, showAi = true }) => {
   const opacity = useFadeIn(300, index * 60);
 
   return (
@@ -69,7 +72,8 @@ const NoteCard: React.FC<{
         <View style={styles.cardMeta}>
           <Text style={styles.metaWords}>{countWords(note.content)} words</Text>
           <View style={styles.aiHint}>
-            <Text style={styles.aiHintText}>✦ Hold for AI</Text>
+            <Image source={LocalImages.ai} style={{ width: 16, height: 16, tintColor: Colors.text.success }} />
+            <Text style={styles.aiHintText}> Hold for AI</Text>
           </View>
         </View>
 
@@ -82,7 +86,7 @@ const NoteCard: React.FC<{
 
 const EmptyState: React.FC = () => (
   <View style={styles.empty}>
-    <Text style={styles.emptyIcon}>📝</Text>
+    <Image source={LocalImages.empty_folder} style={styles.emptyFolder} />
     <Text style={styles.emptyTitle}>{Strings.notes.noNotes}</Text>
     <Text style={styles.emptySubtitle}>{Strings.notes.noNotesSubtitle}</Text>
   </View>
@@ -155,6 +159,8 @@ const NotesList: React.FC<Props> = ({ navigation }) => {
           value={searchQuery}
           onChangeText={q => dispatch(setSearchQuery(q))}
           style={styles.searchInput}
+          leftIcon={
+            <Image source={LocalImages.search} style={{ width: 18, height: 18, tintColor: Colors.text.muted }} />}
         />
       </View>
 
@@ -257,6 +263,11 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: Dimensions_.radius.lg,
     borderBottomLeftRadius: Dimensions_.radius.lg,
   },
+  searchIcon: {
+    marginLeft: Dimensions_.spacing.sm,
+    fontSize: FontSize.base,
+    color: Colors.text.primary,
+  },
   cardTitle: {
     fontSize: FontSize.base,
     fontFamily: FontFamily.semiBold,
@@ -310,10 +321,9 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   aiHintText: {
-    fontSize: FontSize.xs,
+    fontSize: FontSize.sm,
     fontFamily: FontFamily.regular,
-    color: Colors.accent.primary,
-    opacity: 0.5,
+    color: Colors.text.success,
   },
   newBtn: {
     width: 36,
@@ -339,7 +349,12 @@ const styles = StyleSheet.create({
     paddingTop: 80,
     gap: Dimensions_.spacing.md,
   },
-  emptyIcon: { fontSize: 48 },
+  emptyFolder: {
+    height: 100,
+    width: 100,
+    opacity: .8,
+    marginVertical: 40
+  },
   emptyTitle: {
     fontSize: FontSize.xl,
     fontFamily: FontFamily.semiBold,

@@ -9,6 +9,7 @@ export type AuthStackParamList = {
   [ScreenNames.SPLASH]: undefined;
   [ScreenNames.LOGIN]: undefined;
   [ScreenNames.LOCATION_PERMISSION]: undefined;
+  [ScreenNames.SIGNUP]: undefined;
 };
 
 export type NotesStackParamList = {
@@ -89,6 +90,25 @@ export interface LoginPayload {
   password: string;
 }
 
+export type SignupPayload = {
+  email: string;
+  user_name: string;
+  password: string;
+  profile_image?: string;
+  is_active?: boolean;
+  is_superuser?: boolean;
+  is_verified?: boolean;
+};
+
+export type SignupResponse = {
+  id: string;
+  email: string;
+  user_name: string;
+  profile_image: string;
+  is_active: boolean;
+  is_superuser: boolean;
+  is_verified: boolean;
+};
 export interface LoginResponse {
   user: User;
   token: string;
@@ -101,7 +121,7 @@ export interface CreateNotePayload {
   tags: string[];
 }
 
-export interface UpdateNotePayload extends Partial<CreateNotePayload> {}
+export interface UpdateNotePayload extends Partial<CreateNotePayload> { }
 
 export interface ExplainResponse {
   simple: string;

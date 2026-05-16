@@ -60,18 +60,19 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
   return (
-    <View style={[styles.container, transparent && styles.transparent , {marginTop: insets.top }]}>
+    <View style={[styles.container, transparent && styles.transparent, { marginTop: insets.top }]}>
       {/* Left */}
-      <View style={styles.side}>
-        {onBack ? (
-          <TouchableOpacity onPress={onBack} style={styles.backButton} hitSlop={20}>
-            <Text style={styles.backButtonText}>く</Text>
-          </TouchableOpacity>
-        ) : (
-          leftComponent
-        )}
-      </View>
-
+      {leftComponent || onBack &&
+        <View style={styles.side}>
+          {onBack ? (
+            <TouchableOpacity onPress={onBack} style={styles.backButton} hitSlop={20}>
+              <Text style={styles.backButtonText}>く</Text>
+            </TouchableOpacity>
+          ) : (
+            leftComponent
+          )}
+        </View>
+      }
       {/* Title */}
       <View style={[styles.titleContainer, centerTitle && styles.titleCenter]}>
         <Text style={styles.title} numberOfLines={1}>
@@ -109,7 +110,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     justifyContent: 'center',
   },
-  backButtonText:{
+  backButtonText: {
     fontSize: FontSize.base,
     fontFamily: FontFamily.regular,
     color: Colors.text.primary,
@@ -125,9 +126,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: FontSize.lg,
+    fontSize: FontSize.xl,
     fontFamily: FontFamily.semiBold,
-    fontWeight: FontWeight.semiBold,
+    fontWeight: FontWeight.bold,
     color: Colors.text.primary,
     letterSpacing: 0.2,
   },

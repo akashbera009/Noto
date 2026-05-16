@@ -38,7 +38,7 @@ const AISummarizeModal: React.FC<Props> = ({ visible, onClose, noteId }) => {
     if (!visible) {
       dispatch(clearSummary());
     }
-  }, [visible]);
+  }, [visible, noteId, dispatch]);
 
   const handleCopy = () => {
     if (!summary?.summary) return;
@@ -59,6 +59,7 @@ const AISummarizeModal: React.FC<Props> = ({ visible, onClose, noteId }) => {
       visible={visible}
       animationType="slide"
       transparent
+      statusBarTranslucent
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: Colors.overlay,
   },
   sheet: {
@@ -310,17 +311,17 @@ const styles = StyleSheet.create({
     paddingVertical: Dimensions_.spacing.md,
     borderRadius: Dimensions_.radius.lg,
     borderWidth: 1,
-    borderColor: Colors.border.subtle,
+    borderColor: Colors.text.success,
     backgroundColor: Colors.bg.elevated,
   },
   regenIcon: {
     fontSize: 16,
-    color: Colors.text.muted,
+    color: Colors.text.success,
   },
   regenText: {
     fontSize: FontSize.sm,
     fontFamily: FontFamily.medium,
-    color: Colors.text.muted,
+    color: Colors.text.success,
   },
 });
 

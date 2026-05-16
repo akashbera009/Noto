@@ -1,7 +1,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { authService } from '../../services/authService';
 import MMKVStorage, { StorageKeys } from '../../utils/mmkvStorage';
-import type { LoginPayload, LoginResponse, User } from '../../utils/types';
+import type { LoginPayload, LoginResponse, SignupPayload, SignupResponse, User } from '../../utils/types';
 import Strings from '../../utils/strings';
 import { hydrateAuth, clearAuth } from './authSlice';
 
@@ -65,7 +65,26 @@ export const loginThunk = createAsyncThunk<
     });
   }
 });
-
+export const signupThunk = createAsyncThunk<
+  SignupResponse,                                        // ← was LoginResponse
+  SignupPayload,
+  { rejectValue: { status: number; message: string } }
+>('auth/signup', async (payload, { rejectWithValue }) => {
+  try {
+    const response = await authService.signup(payload);
+    // No tokens returned — just store the user if needed
+    MMKVStorage.setObject(StorageKeys.USER, response);
+    return response;
+  } catch (error: any) {
+    console.error('[SignupThunk Error]', error);
+    return rejectWithValue({
+      status: error?.status ?? 0,
+      message: error?.status === 409
+        ? Strings.errors.emailAlreadyExists
+        : error?.data?.detail ?? error?.message ?? Strings.errors.generic,
+    });
+  }
+});
 export const logoutThunk = createAsyncThunk<
   void,
   void,

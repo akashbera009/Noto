@@ -76,6 +76,7 @@ const AIActionSheet: React.FC<Props> = ({
       visible={visible}
       animationType="none"
       transparent
+      statusBarTranslucent
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>

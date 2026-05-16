@@ -1,6 +1,6 @@
 import { apiClient } from './apiClient';
 import { Endpoints } from '../utils/endpoints';
-import type { LoginPayload, LoginResponse, User } from '../utils/types';
+import type { LoginPayload, LoginResponse, SignupPayload, SignupResponse, User } from '../utils/types';
 
 export const authService = {
   login: async (payload: LoginPayload): Promise<LoginResponse> => {
@@ -38,7 +38,16 @@ export const authService = {
       user: user,
     };
   },
-
+  signup: async (payload: SignupPayload): Promise<SignupResponse> => {
+    const response = await apiClient.post('/auth/register', {
+      ...payload,
+      profile_image: payload.profile_image ?? '',
+      is_active: true,
+      is_superuser: false,
+      is_verified: false,
+    });
+    return response as SignupResponse;
+  },
   logout: (): Promise<void> =>
     apiClient.post<void>(Endpoints.auth.logout),
 

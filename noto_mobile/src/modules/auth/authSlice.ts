@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import type { AuthState, User } from '../../utils/types';
-import { loginThunk, logoutThunk, initializeAuth, updateAvatarThunk, getProfileThunk, updateNameThunk } from './authActions';
+import { loginThunk, logoutThunk, initializeAuth, updateAvatarThunk, getProfileThunk, updateNameThunk, signupThunk } from './authActions';
 
 const initialState: AuthState = {
   user: null,
@@ -55,6 +55,21 @@ const authSlice = createSlice({
       })
       .addCase(initializeAuth.rejected, state => {
         state.isInitializing = false;
+      });
+
+    // Signup
+    builder
+      .addCase(signupThunk.pending, state => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(signupThunk.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.isAuthenticated = true;
+      })
+      .addCase(signupThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload?.message as string;
       });
 
     // Login

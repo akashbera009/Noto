@@ -5,9 +5,9 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  StatusBar,
   KeyboardAvoidingView,
   Platform,
-  StatusBar,
 } from 'react-native';
 import { Colors } from '../../../utils/colors';
 import { FontFamily, FontSize, FontWeight } from '../../../utils/fonts';
@@ -21,6 +21,7 @@ import CustomInput from '../../../components/CustomInput';
 import CustomButton from '../../../components/CustomButton';
 import showSnackbar from '../../../utils/showSnackbar';
 import type { NotesNavProp, EditNoteRouteProp } from '../../../utils/types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 interface CreateProps {
   navigation: NotesNavProp;
@@ -101,10 +102,12 @@ const NoteEditor: React.FC<Props> = ({ navigation, route }) => {
     setTags(prev => prev.filter(t => t !== tag));
   };
 
+  const insets = useSafeAreaInsets()
+
   return (
-    <View
+    <KeyboardAvoidingView
       style={styles.flex}
-    // behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <StatusBar barStyle="light-content" />
 
@@ -177,7 +180,7 @@ const NoteEditor: React.FC<Props> = ({ navigation, route }) => {
       </ScrollView>
 
       {/* Bottom action */}
-      <View style={styles.bottomBar}>
+      <View style={[styles.bottomBar, { bottom: insets.bottom }]}>
         <View style={styles.statsRow}>
           <Text style={styles.statsText}>
             {content.split(/\s+/).filter(Boolean).length} words · {content.length} chars
@@ -192,7 +195,7 @@ const NoteEditor: React.FC<Props> = ({ navigation, route }) => {
           style={styles.saveBtn}
         />
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

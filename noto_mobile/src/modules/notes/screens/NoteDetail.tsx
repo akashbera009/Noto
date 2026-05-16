@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   StatusBar,
+  Image,
 } from 'react-native';
 import { Colors } from '../../../utils/colors';
 import { FontFamily, FontSize, FontWeight } from '../../../utils/fonts';
@@ -22,6 +23,7 @@ import AIExplainModal from '../../../modals/AIExplainModal';
 import AISummarizeModal from '../../../modals/AISummarizeModal';
 import AIActionSheet from '../../../modals/AIActionSheet';
 import type { NotesNavProp, NoteDetailRouteProp } from '../../../utils/types';
+import LocalImages from '../../../utils/localImages';
 
 interface Props {
   navigation: NotesNavProp;
@@ -84,12 +86,14 @@ const NoteDetail: React.FC<Props> = ({ navigation, route }) => {
                 navigation.navigate(ScreenNames.EDIT_NOTE, { noteId: note.id })
               }
             >
+              <Image source={LocalImages.edit_note} style={{ width: 16, height: 16, tintColor: Colors.accent.primary, }} />
               <Text style={styles.headerBtnText}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.headerBtn, styles.deleteBtn]}
               onPress={handleDelete}
             >
+              <Image source={LocalImages.delete} style={{ width: 16, height: 16, tintColor: Colors.status.error, }} />
               <Text style={styles.deleteBtnText}>Delete</Text>
             </TouchableOpacity>
           </View>
@@ -103,40 +107,40 @@ const NoteDetail: React.FC<Props> = ({ navigation, route }) => {
         delayLongPress={400}
         style={styles.flex}
       > */}
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Title */}
-          <Text style={styles.title}>{note.title}</Text>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Title */}
+        <Text style={styles.title}>{note.title}</Text>
 
-          {/* Meta row */}
-          <View style={styles.meta}>
-            <Text style={styles.metaText}>{countWords(note.content)} words</Text>
-            <View style={styles.metaDot} />
-            <Text style={styles.metaText}>{note.content.length} chars</Text>
+        {/* Meta row */}
+        <View style={styles.meta}>
+          <Text style={styles.metaText}>{countWords(note.content)} words</Text>
+          <View style={styles.metaDot} />
+          <Text style={styles.metaText}>{note.content.length} chars</Text>
+        </View>
+
+        {/* Tags */}
+        {note.tags && note.tags.length > 0 && (
+          <View style={styles.tags}>
+            {note.tags.map(tag => (
+              <View key={tag} style={styles.tag}>
+                <Text style={styles.tagText}>#{tag}</Text>
+              </View>
+            ))}
           </View>
+        )}
 
-          {/* Tags */}
-          {note.tags && note.tags.length > 0 && (
-            <View style={styles.tags}>
-              {note.tags.map(tag => (
-                <View key={tag} style={styles.tag}>
-                  <Text style={styles.tagText}>#{tag}</Text>
-                </View>
-              ))}
-            </View>
-          )}
+        {/* Divider */}
+        <View style={styles.divider} />
 
-          {/* Divider */}
-          <View style={styles.divider} />
+        {/* Content */}
+        <Text style={styles.content}>{note.content}</Text>
 
-          {/* Content */}
-          <Text style={styles.content}>{note.content}</Text>
-
-          {/* Long press hint */}
-          <Text style={styles.longPressHint}>Hold to open AI tools</Text>
-        </ScrollView>
+        {/* Long press hint */}
+        <Text style={styles.longPressHint}>Hold to open AI tools</Text>
+      </ScrollView>
       {/* </TouchableOpacity> */}
 
       {/* AI FAB — always visible */}
@@ -260,14 +264,16 @@ const styles = StyleSheet.create({
     color: Colors.text.muted,
   },
   headerActions: {
-    position: 'absolute',
     flexDirection: 'row',
     gap: Dimensions_.spacing.sm,
   },
   headerBtn: {
+    minWidth: 80,
     justifyContent: 'center',
+    flexDirection: 'row',
+    gap: Dimensions_.spacing.sm,
     paddingHorizontal: Dimensions_.spacing.md,
-    paddingVertical: Dimensions_.spacing.xs,
+    paddingVertical: Dimensions_.spacing.md,
     borderRadius: Dimensions_.radius.sm,
     backgroundColor: Colors.bg.elevated,
   },

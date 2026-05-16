@@ -19,6 +19,10 @@ import { updateAvatarThunk, updateNameThunk, logoutThunk } from '../authActions'
 import CustomInput from '../../../components/CustomInput';
 import CustomButton from '../../../components/CustomButton';
 import showSnackbar from '../../../utils/showSnackbar';
+import CustomHeader from '../../../components/CustomHeader';
+import LocalImages from '../../../utils/localImages';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 const ProfileScreen: React.FC = () => {
     const dispatch = useAppDispatch();
@@ -78,16 +82,21 @@ const ProfileScreen: React.FC = () => {
     const handleLogout = () => {
         dispatch(logoutThunk());
     };
+    const insets = useSafeAreaInsets()
+    const bottomTbaHeight = useBottomTabBarHeight()
 
     return (
         <KeyboardAvoidingView
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         >
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Profile</Text>
-                </View>
+            <CustomHeader
+                title='Profile'
+            />
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                style={{ paddingBottom: insets.bottom + bottomTbaHeight + 10 }}
+            >
 
                 <View style={styles.profileSection}>
                     <TouchableOpacity
@@ -105,7 +114,7 @@ const ProfileScreen: React.FC = () => {
                             </View>
                         )}
                         <View style={styles.editImageIcon}>
-                            <Text style={styles.iconText}>📷</Text>
+                            <Image source={LocalImages.camera} style={{ width: '90%', height: '90%', tintColor: Colors.black }} />
                         </View>
                     </TouchableOpacity>
 
@@ -125,12 +134,19 @@ const ProfileScreen: React.FC = () => {
                                     </TouchableOpacity>
                                 </View>
                             ) : (
-                                <View style={styles.displayNameContainer}>
-                                    <Text style={styles.userNameText}>{user?.user_name || 'No Name'}</Text>
-                                    <TouchableOpacity onPress={() => setIsEditingName(true)} style={styles.actionIcon}>
-                                        <Text style={styles.editIcon}>✎</Text>
-                                    </TouchableOpacity>
-                                </View>
+                                <>
+                                    <View style={styles.displayNameContainer}>
+                                        <View style={{ position: 'relative' }}>
+                                            <Text style={[styles.userNameText, { color: !user?.user_name ? Colors.text.muted : Colors.text.primary }]}>{user?.user_name || 'Add name'}</Text>
+                                            <TouchableOpacity
+                                                onPress={() => setIsEditingName(true)}
+                                                style={styles.editIcon}
+                                            >
+                                                <Image source={LocalImages.edit} style={{ width: 18, height: 18, tintColor: Colors.text.muted }} />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                </>
                             )}
                         </View>
                         <Text style={styles.userEmailText}>{user?.email}</Text>
@@ -139,21 +155,26 @@ const ProfileScreen: React.FC = () => {
                 </View>
 
                 <View style={styles.footer}>
-                    <CustomButton
-                        label="Logout"
-                        onPress={handleLogout}
-                        variant="danger"
-                        style={styles.logoutBtn}
-                    />
+                    <TouchableOpacity
+                        style={[styles.modalButton, styles.logoutButton]}
+                        onPress={() => {
+                            handleLogout();
+                        }}
+                    >
+                        <Image source={LocalImages.logout} style={styles.modalButtonIcon} tintColor={Colors.status.error} />
+                        <Text style={[styles.modalButtonText, styles.logoutButtonText]}>Logout</Text>
+                    </TouchableOpacity>
                 </View>
             </ScrollView>
 
-            {isLoading && (
-                <View style={styles.loadingOverlay}>
-                    <ActivityIndicator size="large" color={Colors.accent.primary} />
-                </View>
-            )}
-        </KeyboardAvoidingView>
+            {
+                isLoading && (
+                    <View style={styles.loadingOverlay}>
+                        <ActivityIndicator size="large" color={Colors.accent.primary} />
+                    </View>
+                )
+            }
+        </KeyboardAvoidingView >
     );
 };
 
@@ -256,7 +277,7 @@ const styles = StyleSheet.create({
     userEmailText: {
         fontSize: FontSize.base,
         fontFamily: FontFamily.regular,
-        color: Colors.text.secondary,
+        color: Colors.text.accent,
         marginBottom: Dimensions_.spacing.xs,
     },
     userIdText: {
@@ -267,10 +288,15 @@ const styles = StyleSheet.create({
     actionIcon: {
         marginLeft: Dimensions_.spacing.md,
         padding: Dimensions_.spacing.xs,
+        position: 'relative'
     },
     editIcon: {
-        fontSize: 20,
-        color: Colors.accent.primary,
+        position: 'absolute',
+        left: '100%',
+        marginLeft: Dimensions_.spacing.sm,
+        padding: Dimensions_.spacing.xs,
+        top: '50%',
+        marginTop: -15,
     },
     tickIcon: {
         fontSize: 24,
@@ -283,14 +309,41 @@ const styles = StyleSheet.create({
         marginTop: 'auto',
         paddingTop: Dimensions_.spacing['3xl'],
     },
-    logoutBtn: {
-        marginTop: Dimensions_.spacing.xl,
+    modalButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        padding: Dimensions_.spacing.md,
+        borderRadius: Dimensions_.radius.md,
+        backgroundColor: Colors.bg.elevated,
+        marginBottom: Dimensions_.spacing.sm,
+    },
+    modalButtonIcon: {
+        width: 20,
+        height: 20,
+        marginRight: Dimensions_.spacing.md,
+        resizeMode: 'contain',
+    },
+    modalButtonText: {
+        fontSize: FontSize.base,
+        fontFamily: FontFamily.medium,
+        color: Colors.text.primary,
     },
     loadingOverlay: {
         ...StyleSheet.absoluteFill,
         backgroundColor: 'rgba(0,0,0,0.5)',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    logoutButton: {
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255, 77, 106, 0.05)',
+        marginTop: Dimensions_.spacing.sm,
+        borderColor: 'rgba(255, 77, 106, 0.2)',
+        borderWidth: 1,
+    },
+    logoutButtonText: {
+        color: Colors.status.error,
     },
 });
 

@@ -11,6 +11,7 @@ import { FontFamily, FontSize } from '../utils/fonts';
 import { Dimensions_ } from '../utils/dimensions';
 import { toastBus } from '../utils/showSnackbar';
 import type { ToastConfig } from '../utils/types';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const ICON_MAP = {
   success: '✓',
@@ -68,10 +69,10 @@ const ToastItem: React.FC<{ toast: ToastConfig; onDismiss: (id: string) => void 
   };
 
   const accent = COLOR_MAP[toast.type];
-
+  const insets = useSafeAreaInsets();
   return (
     <Animated.View
-      style={[styles.toast, { transform: [{ translateY }], opacity }]}
+      style={[styles.toast, { transform: [{ translateY }], opacity }, { top: Dimensions_.spacing.lg }]}
     >
       <View style={[styles.indicator, { backgroundColor: accent }]} />
       <View style={styles.iconContainer}>
@@ -166,9 +167,10 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.medium,
     color: Colors.text.primary,
     lineHeight: 18,
+    marginVertical: Dimensions_.spacing.sm,
   },
   close: {
-    fontSize: FontSize.xs,
+    fontSize: FontSize.md,
     color: Colors.text.muted,
     marginLeft: Dimensions_.spacing.sm,
   },

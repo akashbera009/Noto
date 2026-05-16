@@ -4,7 +4,7 @@ import authReducer, { clearAuth } from '../modules/auth/authSlice';
 import notesReducer from '../modules/notes/notesSlice';
 
 const logger = createLogger({
-  collapsed: true,
+  collapsed: false,
 });
 
 /**

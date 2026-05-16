@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,9 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
+  Image,
+  Pressable,
+  Modal
 } from 'react-native';
 import { Colors } from '../../utils/colors';
 import { FontFamily, FontSize, FontWeight } from '../../utils/fonts';
@@ -15,7 +18,14 @@ import { ScreenNames } from '../../utils/screenNames';
 import { logoutThunk } from '../auth/authActions';
 import { fetchNotesThunk } from '../notes/notesActions';
 import { truncateText } from '../../utils/commonFunctions';
-import type { BottomTabNavProp } from '../../utils/types';
+import type { BottomTabNavProp, NotesStackParamList } from '../../utils/types';
+
+import LocalImages from '../../utils/localImages';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { NoteCard } from '../notes/screens/NoteCard';
 
 interface Props {
   navigation: BottomTabNavProp;
@@ -33,6 +43,7 @@ const Home: React.FC<Props> = ({ navigation }) => {
   const { user } = useAppSelector(s => s.auth);
   const { notes } = useAppSelector(s => s.notes);
 
+  const rootNavigation = useNavigation<NativeStackNavigationProp<NotesStackParamList>>();
   // Fetch notes when Home mounts — this is the first screen on app open
   useEffect(() => {
     dispatch(fetchNotesThunk());
@@ -44,6 +55,17 @@ const Home: React.FC<Props> = ({ navigation }) => {
     dispatch(logoutThunk());
   };
 
+  const [isModelOpen, setIsModel] = useState(false)
+  const handleModleOpen = () => {
+    setIsModel(!isModelOpen)
+  }
+
+  const handleCreateNoteNavigation = () => {
+    rootNavigation?.navigate(ScreenNames.CREATE_NOTE as never);
+  }
+
+  const insets = useSafeAreaInsets()
+  const bottomTbaHeight = useBottomTabBarHeight()
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
@@ -55,7 +77,9 @@ const Home: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.greeting}>{getGreeting()},</Text>
             <Text style={styles.userName}>{user?.name ?? 'there'} 👋</Text>
           </View>
-          <TouchableOpacity style={styles.avatar} onPress={handleLogout}>
+          <TouchableOpacity style={styles.avatar}
+            onPress={handleModleOpen}
+          >
             <Text style={styles.avatarText}>
               {(user?.name ?? 'U').charAt(0).toUpperCase()}
             </Text>
@@ -75,20 +99,6 @@ const Home: React.FC<Props> = ({ navigation }) => {
           ))}
         </View>
 
-        {/* Quick action */}
-        <TouchableOpacity
-          style={styles.quickCreate}
-          onPress={() => navigation.navigate(ScreenNames.NOTES_TAB)}
-          activeOpacity={0.8}
-        >
-          <View style={styles.quickCreateInner}>
-            <Text style={styles.quickCreatePlaceholder}>Start a new note…</Text>
-            <View style={styles.quickCreateBtn}>
-              <Text style={styles.quickCreateBtnText}>+</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-
         {/* Recent notes */}
         {recentNotes.length > 0 && (
           <>
@@ -99,35 +109,26 @@ const Home: React.FC<Props> = ({ navigation }) => {
               </TouchableOpacity>
             </View>
 
-            {recentNotes.map(note => (
-              <TouchableOpacity
-                key={note.id}
-                style={styles.recentCard}
-                onPress={() => navigation.navigate(ScreenNames.NOTES_TAB)}
-                activeOpacity={0.75}
-              >
-                <View style={styles.recentAccent} />
-                <View style={styles.recentBody}>
-                  <Text style={styles.recentTitle} numberOfLines={1}>
-                    {note.title}
-                  </Text>
-                  <Text style={styles.recentPreview} numberOfLines={1}>
-                    {truncateText(note.content, 80)}
-                  </Text>
-                  {note.tags.length > 0 && (
-                    <Text style={styles.recentTags} numberOfLines={1}>
-                      {note.tags.slice(0, 3).map(t => `#${t}`).join(' ')}
-                    </Text>
-                  )}
-                </View>
-              </TouchableOpacity>
+            {recentNotes.map((note, index) => (
+              <NoteCard
+                note={note}
+                onPress={() => rootNavigation.navigate(ScreenNames.NOTE_DETAIL, { noteId: note.id })}
+                onLongPress={() => { }}
+                index={index}
+                key={index.toString()}
+                showAi={false}
+                trunketTextSize={60}
+                numOfLinesToTrunk={1}
+              />
             ))}
           </>
         )}
 
         {notes?.length === 0 && (
           <View style={styles.emptyHome}>
-            <Text style={styles.emptyHomeIcon}>✍️</Text>
+            <Image
+              source={LocalImages.empty_folder}
+              style={styles.emptyFolder} />
             <Text style={styles.emptyHomeText}>Your notes will appear here</Text>
             <Text style={styles.emptyHomeSubtext}>
               Tap the Notes tab or the quick create bar above to get started.
@@ -135,14 +136,84 @@ const Home: React.FC<Props> = ({ navigation }) => {
           </View>
         )}
       </ScrollView>
+
+      <TouchableOpacity
+        onPress={handleCreateNoteNavigation}
+        activeOpacity={0.8}
+        style={[styles.bottomCreate, { bottom: insets.bottom + 1.5 * bottomTbaHeight }]}
+      >
+        <View style={styles.quickCreateBtn}>
+          <Image
+            source={LocalImages.plus}
+            style={styles.quickCreateBtnText}
+            resizeMode="contain"
+            tintColor={Colors.text.secondary}
+          />
+        </View>
+      </TouchableOpacity>
+
+      <Modal
+        visible={isModelOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleModleOpen}
+      >
+        <Pressable style={styles.modalOverlay} onPress={handleModleOpen}>
+          <View style={styles.modalContent}>
+            <View style={styles.profileHeader}>
+              <View style={styles.modalAvatarContainer}>
+                {user?.profile_image || user?.avatar ? (
+                  <Image
+                    source={{ uri: user?.profile_image || user?.avatar }}
+                    style={styles.modalAvatar}
+                  />
+                ) : (
+                  <View style={styles.modalAvatarPlaceholder}>
+                    <Text style={styles.modalAvatarText}>
+                      {(user?.name ?? 'U').charAt(0).toUpperCase()}
+                    </Text>
+                  </View>
+                )}
+              </View>
+              <Text style={styles.modalUserName}>{user?.name ?? 'User'}</Text>
+              <Text style={styles.modalUserEmail}>{user?.email ?? ''}</Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.modalButton}
+              onPress={() => {
+                handleModleOpen();
+                navigation.navigate(ScreenNames.PROFILE_TAB as never);
+              }}
+            >
+              <Image source={LocalImages.profileIcon} style={styles.modalButtonIcon} tintColor={Colors.accent.primary} />
+              <Text style={styles.modalButtonText}>View Profile</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.modalButton, styles.logoutButton]}
+              onPress={() => {
+                handleModleOpen();
+                handleLogout();
+              }}
+            >
+              <Image source={LocalImages.delete} style={styles.modalButtonIcon} tintColor={Colors.status.error} />
+              <Text style={[styles.modalButtonText, styles.logoutButtonText]}>Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: Colors.bg.primary },
+  container: {
+    flex: 1, backgroundColor: Colors.bg.primary,
+  },
   scroll: {
-    padding: Dimensions_.spacing['2xl'],
+    padding: Dimensions_.spacing.base,
+    paddingTop: Dimensions_.spacing['2xl'],
     paddingBottom: 100,
   },
   header: {
@@ -214,6 +285,10 @@ const styles = StyleSheet.create({
     marginBottom: Dimensions_.spacing['2xl'],
     overflow: 'hidden',
   },
+  bottomCreate: {
+    position: 'absolute',
+    right: Dimensions_.spacing.xl,
+  },
   quickCreateInner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -227,18 +302,17 @@ const styles = StyleSheet.create({
     color: Colors.text.muted,
   },
   quickCreateBtn: {
-    width: 32,
-    height: 32,
+    width: 48,
+    height: 48,
     borderRadius: 16,
     backgroundColor: Colors.accent.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   quickCreateBtnText: {
-    fontSize: 22,
-    color: Colors.text.inverse,
-    lineHeight: 26,
-    fontWeight: '300',
+    width: 18,
+    height: 18,
+    tintColor: Colors.black
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -302,6 +376,12 @@ const styles = StyleSheet.create({
     gap: Dimensions_.spacing.md,
   },
   emptyHomeIcon: { fontSize: 48 },
+  emptyFolder: {
+    height: 100,
+    width: 100,
+    opacity: .8,
+    marginVertical: 40
+  },
   emptyHomeText: {
     fontSize: FontSize.lg,
     fontFamily: FontFamily.semiBold,
@@ -315,6 +395,105 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
     paddingHorizontal: Dimensions_.spacing.base,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Dimensions_.spacing.xl,
+  },
+  modalContent: {
+    width: '85%',
+    backgroundColor: Colors.bg.modal,
+    borderRadius: Dimensions_.radius['2xl'],
+    padding: Dimensions_.spacing.xl,
+    borderWidth: 1,
+    borderColor: Colors.border.default,
+    alignItems: 'center',
+    elevation: 10,
+    shadowColor: Colors.black,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 20,
+  },
+  profileHeader: {
+    alignItems: 'center',
+    marginBottom: Dimensions_.spacing.xl,
+  },
+  modalAvatarContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: Colors.bg.elevated,
+    borderWidth: 2,
+    borderColor: Colors.accent.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Dimensions_.spacing.md,
+    overflow: 'hidden',
+  },
+  modalAvatar: {
+    width: '100%',
+    height: '100%',
+  },
+  modalAvatarPlaceholder: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.accent.muted,
+  },
+  modalAvatarText: {
+    fontSize: FontSize['3xl'],
+    fontFamily: FontFamily.bold,
+    color: Colors.accent.primary,
+  },
+  modalUserName: {
+    fontSize: FontSize.xl,
+    fontFamily: FontFamily.bold,
+    color: Colors.text.primary,
+    marginBottom: 4,
+  },
+  modalUserEmail: {
+    fontSize: FontSize.sm,
+    fontFamily: FontFamily.regular,
+    color: Colors.text.muted,
+  },
+  modalDivider: {
+    width: '100%',
+    height: 1,
+    backgroundColor: Colors.border.default,
+    marginBottom: Dimensions_.spacing.lg,
+  },
+  modalButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    padding: Dimensions_.spacing.md,
+    borderRadius: Dimensions_.radius.md,
+    backgroundColor: Colors.bg.elevated,
+    marginBottom: Dimensions_.spacing.sm,
+  },
+  modalButtonIcon: {
+    width: 20,
+    height: 20,
+    marginRight: Dimensions_.spacing.md,
+    resizeMode: 'contain',
+  },
+  modalButtonText: {
+    fontSize: FontSize.base,
+    fontFamily: FontFamily.medium,
+    color: Colors.text.primary,
+  },
+  logoutButton: {
+    backgroundColor: 'rgba(255, 77, 106, 0.05)',
+    marginTop: Dimensions_.spacing.sm,
+    borderColor: 'rgba(255, 77, 106, 0.2)',
+    borderWidth: 1,
+  },
+  logoutButtonText: {
+    color: Colors.status.error,
   },
 });
 

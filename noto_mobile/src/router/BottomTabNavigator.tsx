@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Platform,
+  Image,
 } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { getFocusedRouteNameFromRoute, Route } from '@react-navigation/native';
@@ -17,18 +18,21 @@ import Home from '../modules/Home/Home';
 import NotesNavigator from './HomeNavigator';
 import { ProfileScreen } from '../modules/auth/screens';
 import type { BottomTabParamList } from '../utils/types';
+import LocalImages from '../utils/localImages';
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
 // ─── Custom Tab Bar ───────────────────────────────────────────────────────────
 
 const TAB_ITEMS = [
-  { name: ScreenNames.HOME_TAB, label: 'Home', icon: '⌂', iconActive: '⌂' },
-  { name: ScreenNames.NOTES_TAB, label: 'Notes', icon: '✎', iconActive: '✎' },
-  { name: ScreenNames.PROFILE_TAB, label: 'Profile', icon: '◎', iconActive: '◎' },
+  { name: ScreenNames.HOME_TAB, label: 'Home', icon: LocalImages.homeIcon },
+  { name: ScreenNames.NOTES_TAB, label: 'Notes', icon: LocalImages.noteIcon },
+  { name: ScreenNames.PROFILE_TAB, label: 'Profile', icon: LocalImages.profileIcon },
+
 ] as const;
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
+
   return (
     <View style={tabStyles.container}>
       <View style={tabStyles.inner}>
@@ -42,9 +46,12 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
               activeOpacity={0.7}
             >
               <View style={[tabStyles.iconWrapper, isFocused && tabStyles.iconActive]}>
-                <Text style={[tabStyles.icon, isFocused && tabStyles.iconTextActive]}>
-                  {isFocused ? item.iconActive : item.icon}
-                </Text>
+                <Image
+                  source={item.icon}
+                  style={tabStyles.icon}
+                  resizeMode="contain"
+                  tintColor={isFocused ? Colors.accent.primary : Colors.text.muted}
+                />
               </View>
               <Text style={[tabStyles.label, isFocused && tabStyles.labelActive]}>
                 {item.label}
@@ -95,8 +102,8 @@ const tabStyles = StyleSheet.create({
     backgroundColor: Colors.accent.muted,
   },
   icon: {
-    fontSize: 20,
-    color: Colors.text.muted,
+    width: 24,
+    height: 24,
   },
   iconTextActive: {
     color: Colors.accent.primary,
@@ -151,7 +158,7 @@ const BottomTabNavigator: React.FC = () => {
           // Log screen view when tab is focused
           if (route.name) {
             console.log(route.name);
-          }else {
+          } else {
             console.log('No route name');
           }
         },

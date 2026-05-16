@@ -25,6 +25,7 @@ export const Colors = {
     muted: '#55556A',
     inverse: '#0A0A0F',
     accent: '#00C2FF',
+    success: '#0ef7b1ff',
   },
 
   // Borders

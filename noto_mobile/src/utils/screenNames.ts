@@ -2,6 +2,7 @@ export const ScreenNames = {
   // Auth
   SPLASH: 'Splash',
   LOGIN: 'Login',
+  SIGNUP: 'Signup',
   LOCATION_PERMISSION: 'LocationPermission',
 
   // Main Tabs

@@ -16,12 +16,21 @@ export const Strings = {
     loginSubtitle: 'Welcome back to Noto',
     loginTitle: 'Sign in',
     noAccount: "Don't have an account?",
-    signUp: 'Sign up',
     orContinueWith: 'or continue with',
     verificationTitle: 'Verify your identity',
     verificationSubtitle: 'Enter the 6-digit code sent to your email',
     resendCode: 'Resend code',
     verify: 'Verify',
+    signupTitle: 'Create account',
+    signupSubtitle: 'Join us today',
+    userName: 'Username',
+    userNamePlaceholder: 'your_username',
+    confirmPassword: 'Confirm password',
+    confirmPasswordPlaceholder: '••••••••',
+    signUp: 'Create account',
+    alreadyHaveAccount: 'Already have an account?',
+    signupSuccess: 'Account created successfully!',
+    loginSuccess: 'Login successful!',
   },
 
   notes: {
@@ -76,6 +85,10 @@ export const Strings = {
     passwordMinLength: 'Password must be at least 8 characters.',
     noteTitle: 'Note title is required.',
     noteContent: 'Note content cannot be empty.',
+    userNameRequired: 'Username is required',
+    confirmPasswordRequired: 'Please confirm your password',
+    passwordMismatch: 'Passwords do not match',
+    emailAlreadyExists: 'An account with this email already exists',
   },
 
   common: {

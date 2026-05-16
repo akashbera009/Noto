@@ -41,7 +41,7 @@ const AIExplainModal: React.FC<Props> = ({ visible, onClose, noteId }) => {
     if (!visible) {
       dispatch(clearExplanation());
     }
-  }, [visible]);
+  }, [visible, noteId, dispatch]);
 
   // Re-fetch when mode changes
   const handleModeChange = (newMode: ExplainMode) => {
@@ -71,6 +71,7 @@ const AIExplainModal: React.FC<Props> = ({ visible, onClose, noteId }) => {
       visible={visible}
       animationType="slide"
       transparent
+      statusBarTranslucent
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: Colors.overlay,
   },
   sheet: {

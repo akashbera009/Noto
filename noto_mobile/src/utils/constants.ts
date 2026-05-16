@@ -22,7 +22,7 @@ export const Constants = {
   },
 
   // API
-  API_TIMEOUT: 15000, // 15s
+  API_TIMEOUT: 30000, // 30s
   RETRY_ATTEMPTS: 3,
 
   // Search debounce

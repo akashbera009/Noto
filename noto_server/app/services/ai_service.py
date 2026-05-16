@@ -13,7 +13,7 @@ from app.schemas import ExplanationResponse, SummarizeResponse
 # ==========================================
 print("Loading local AI models (this may take a moment)...")
 # Using local models for both summarize and explain tasks (as requested)
-summarizer = pipeline("summarization", model="google/pegasus-xsum")
+summarizer = pipeline("summarization", model="google/pegasus-xsum") 
 
 explainer = pipeline("text2text-generation", model="google/flan-t5-large")
 print("Local AI models loaded successfully.")

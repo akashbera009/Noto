@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ScreenNames } from '../utils/screenNames';
 import { Splash, Login } from '../modules/auth/screens';
 import type { AuthStackParamList } from '../utils/types';
+import Signup from '../modules/auth/screens/Signup';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
@@ -17,6 +18,7 @@ const AuthNavigator: React.FC<Props> = ({ initialRouteName = ScreenNames.SPLASH 
   >
     <Stack.Screen name={ScreenNames.SPLASH} component={Splash} />
     <Stack.Screen name={ScreenNames.LOGIN} component={Login} />
+    <Stack.Screen name={ScreenNames.SIGNUP} component={Signup} />
   </Stack.Navigator>
 );
 

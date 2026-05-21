@@ -111,7 +111,7 @@ Noto utilizes state-of-the-art models from the Hugging Face ecosystem:
 
 - **Backend**: FastAPI, SQLAlchemy (Async), PostgreSQL/SQLite, Alembic.
 - **Mobile**: React Native, TypeScript, React Navigation, Axios.
-- **AI/ML**: Transformers, LangChain, PyTorch.
+- **AI/ML**: Hugging Face Transformers, Local LLMs.
 
 ---
 

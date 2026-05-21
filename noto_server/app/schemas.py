@@ -9,6 +9,11 @@ class NoteCreate(BaseModel):
     tags: list[str] = []
     content: str
 
+class NoteUpdate(BaseModel):
+    title: Optional[str] = None
+    tags: Optional[list[str]] = None
+    content: Optional[str] = None
+
 class NoteResponse(BaseModel):
     id: uuid.UUID
     title: str | None

@@ -42,7 +42,15 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, navigation }) => {
             <TouchableOpacity
               key={item.name}
               style={tabStyles.tab}
-              onPress={() => navigation.navigate(item.name)}
+              onPress={() => {
+                if (item.name === ScreenNames.NOTES_TAB) {
+                  navigation.navigate(ScreenNames.NOTES_TAB, {
+                    screen: ScreenNames.NOTES_LIST,
+                  });
+                } else {
+                  navigation.navigate(item.name);
+                }
+              }}
               activeOpacity={0.7}
             >
               <View style={[tabStyles.iconWrapper, isFocused && tabStyles.iconActive]}>

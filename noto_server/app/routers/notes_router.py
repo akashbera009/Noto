@@ -4,7 +4,7 @@ from sqlalchemy.future import select
 import uuid
 
 from app.db import get_async_session, User, Note
-from app.schemas import NoteCreate, NoteResponse
+from app.schemas import NoteCreate, NoteResponse, NoteUpdate
 from app.users import current_active_user
 
 router = APIRouter()
@@ -61,10 +61,10 @@ async def delete_note(
     return {"message": "Note deleted successfully"}
 
 # update note 
-@router.put("/{note_id}", response_model=NoteResponse)
+@router.patch("/{note_id}", response_model=NoteResponse)
 async def update_note(
     note_id: uuid.UUID,
-    note_in: NoteCreate,
+    note_in: NoteUpdate,
     user: User = Depends(current_active_user),
     session: AsyncSession = Depends(get_async_session)
 ):
@@ -72,9 +72,15 @@ async def update_note(
     note = result.scalars().first()
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
-    note.title = note_in.title
-    note.tags = note_in.tags
-    note.content = note_in.content
+    
+    # Update only provided fields
+    if note_in.title is not None:
+        note.title = note_in.title
+    if note_in.tags is not None:
+        note.tags = note_in.tags
+    if note_in.content is not None:
+        note.content = note_in.content
+        
     await session.commit()
     await session.refresh(note)
     return note

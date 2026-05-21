@@ -23,8 +23,6 @@ import type { BottomTabNavProp, NotesStackParamList } from '../../utils/types';
 import LocalImages from '../../utils/localImages';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { NoteCard } from '../notes/screens/NoteCard';
 
 interface Props {
@@ -43,7 +41,6 @@ const Home: React.FC<Props> = ({ navigation }) => {
   const { user } = useAppSelector(s => s.auth);
   const { notes } = useAppSelector(s => s.notes);
 
-  const rootNavigation = useNavigation<NativeStackNavigationProp<NotesStackParamList>>();
   // Fetch notes when Home mounts — this is the first screen on app open
   useEffect(() => {
     dispatch(fetchNotesThunk());
@@ -61,7 +58,9 @@ const Home: React.FC<Props> = ({ navigation }) => {
   }
 
   const handleCreateNoteNavigation = () => {
-    rootNavigation?.navigate(ScreenNames.CREATE_NOTE as never);
+    navigation.navigate(ScreenNames.NOTES_TAB, {
+      screen: ScreenNames.CREATE_NOTE
+    } as any);
   }
 
   const insets = useSafeAreaInsets()
@@ -112,7 +111,10 @@ const Home: React.FC<Props> = ({ navigation }) => {
             {recentNotes.map((note, index) => (
               <NoteCard
                 note={note}
-                onPress={() => rootNavigation.navigate(ScreenNames.NOTE_DETAIL, { noteId: note.id })}
+                onPress={() => navigation.navigate(ScreenNames.NOTES_TAB, {
+                  screen: ScreenNames.NOTE_DETAIL,
+                  params: { noteId: note.id }
+                } as any)}
                 onLongPress={() => { }}
                 index={index}
                 key={index.toString()}

@@ -24,6 +24,10 @@
 
 ## 🛠️ Project Structure
 
+<p align="center">
+  <img src="./app_architecture_lr.svg" alt="Project Structure" width="700"/>
+</p>
+
 The project is divided into two main components:
 
 - **[`noto_server`](./noto_server)**: The backend API built with FastAPI, handling data persistence and AI model execution.
